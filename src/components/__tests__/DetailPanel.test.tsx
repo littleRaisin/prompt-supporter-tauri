@@ -53,8 +53,9 @@ beforeEach(() => {
   (upsertTranslation as Mock).mockResolvedValue(undefined);
 
   // clipboard API のモック
-  Object.assign(navigator, {
-    clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+  Object.defineProperty(navigator, 'clipboard', {
+    value: { writeText: vi.fn().mockResolvedValue(undefined) },
+    configurable: true,
   });
 });
 
