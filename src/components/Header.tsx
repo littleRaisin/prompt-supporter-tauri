@@ -18,10 +18,14 @@ const Header = () => {
   const { t } = useTranslation();
 
   const [searchCategories, setSearchCategories] = useState<SearchCategories>(() => {
-    const saved = localStorage.getItem(SEARCH_CATEGORIES_KEY);
-    return saved
-      ? (JSON.parse(saved) as SearchCategories)
-      : { character: true, tag: true, copyright: true };
+    try {
+      const saved = localStorage.getItem(SEARCH_CATEGORIES_KEY);
+      return saved
+        ? (JSON.parse(saved) as SearchCategories)
+        : { character: true, tag: true, copyright: true };
+    } catch {
+      return { character: true, tag: true, copyright: true };
+    }
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
 

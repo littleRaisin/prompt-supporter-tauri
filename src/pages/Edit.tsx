@@ -28,7 +28,7 @@ const Edit = () => {
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>();
   const selectedCategory = watch('category');
   const [isCopyMode, setIsCopyMode] = useState(false);
@@ -87,16 +87,20 @@ const Edit = () => {
 
   const onSubmit = async (data: FormData) => {
     const trimmed = data.promptName.trim();
-    await upsertTranslation({
-      promptName: trimmed,
-      translationText: data.translationText,
-      searchWord: data.searchWord,
-      note: data.note,
-      favorite: data.favorite ? 1 : 0,
-      copyrights: data.copyrights,
-      category: data.category,
-    });
-    navigate('/search/' + trimmed);
+    try {
+      await upsertTranslation({
+        promptName: trimmed,
+        translationText: data.translationText,
+        searchWord: data.searchWord,
+        note: data.note,
+        favorite: data.favorite ? 1 : 0,
+        copyrights: data.copyrights,
+        category: data.category,
+      });
+      navigate('/search/' + trimmed);
+    } catch (err) {
+      toast.error(String(err));
+    }
   };
 
   return (
@@ -118,7 +122,7 @@ const Edit = () => {
         />
       )}
 
-      <form onSubmit={handleSubmit((d) => void onSubmit(d))} className="space-y-4 mt-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
         <div>
           <label className="block font-semibold">{t('common.promptName')}</label>
           <input
@@ -170,7 +174,7 @@ const Edit = () => {
         )}
 
         <div className="flex gap-2">
-          <Button type="submit" text={t('common.saveButton')} variant="primary" />
+          <Button type="submit" text={t('common.saveButton')} variant="primary" disabled={isSubmitting} />
           <Button
             type="button"
             text={t('common.cancelButton')}
