@@ -6,12 +6,17 @@ const path = require('path');
 
 const inputPath = path.resolve(__dirname, '../public/licenses.json');
 const outputPath = path.resolve(__dirname, '../public/licenses.txt');
+const ownPkg = require('../package.json');
+const ownName = ownPkg.name;
 
 const licenses = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 
 let result = '';
 
 for (const pkg of Object.keys(licenses).sort()) {
+  // 自身のパッケージはスキップ
+  if (pkg === ownName || pkg.startsWith(ownName + '@')) continue;
+
   const info = licenses[pkg];
   result += `Package: ${pkg}\n`;
   result += `Version: ${info.version || '-'}\n`;
