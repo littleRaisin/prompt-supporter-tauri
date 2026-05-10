@@ -20,8 +20,8 @@ const SearchResult = () => {
   const [result, setResult] = useState<Translation[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(() => {
-    const saved = localStorage.getItem(LIMIT_KEY);
-    return saved ? Number(saved) : DEFAULT_PAGE_SIZE;
+    const parsed = Number(localStorage.getItem(LIMIT_KEY));
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_PAGE_SIZE;
   });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);

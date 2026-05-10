@@ -45,6 +45,7 @@
     "deleteConfirmTitle": "Confirm Deletion",
     "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "deletedMessage": "Deleted successfully",
-    "promptNameRequired": "promptName is required"
+    "promptNameRequired": "promptName is required",
+    "Loading": "Loading..."
   }
 }
