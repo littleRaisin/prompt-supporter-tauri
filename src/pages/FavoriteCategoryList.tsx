@@ -78,7 +78,7 @@ const FavoriteCategoryList = () => {
         {t('common.Favorite List')}: {category ? categoryLabels[category] : ''}
       </h2>
       {loading ? (
-        <div>{t('common.Loading')}</div>
+        <div>Loading...</div>
       ) : favorites.length === 0 ? (
         <div>{t('common.No favorites')}</div>
       ) : (
