@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -9,6 +9,7 @@ import Pagination from '../components/Pagination';
 import { useItemActions } from '../hooks/useItemActions';
 import { searchTranslations } from '../db/repository';
 import type { Translation } from '../types/Translation';
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '../constants/pagination';
 
 const LIMIT_KEY = 'search_result_limit';
 
@@ -20,12 +21,14 @@ const SearchResult = () => {
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(() => {
     const saved = localStorage.getItem(LIMIT_KEY);
-    return saved ? Number(saved) : 20;
+    return saved ? Number(saved) : DEFAULT_PAGE_SIZE;
   });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
   const { currentItem, sideOpen, handleClick, handleEdit, closeSidePanel } = useItemActions();
+
+  const requestIdRef = useRef(0);
 
   const refreshSearchResults = useCallback(() => {
     if (!promptName) return;
@@ -38,17 +41,23 @@ const SearchResult = () => {
       copyright: params.get('copyright') === 'true',
     };
 
+    const requestId = ++requestIdRef.current;
+
     searchTranslations({ keyword: promptName, categories, limit, page })
       .then((res) => {
+        if (requestId !== requestIdRef.current) return;
         setResult(res.items);
         setTotal(res.total);
       })
       .catch((err: unknown) => {
+        if (requestId !== requestIdRef.current) return;
         setResult(null);
         setTotal(0);
         toast.error(String(err));
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (requestId === requestIdRef.current) setLoading(false);
+      });
   }, [promptName, location.search, limit, page]);
 
   useEffect(() => {
@@ -82,7 +91,7 @@ const SearchResult = () => {
                 onChange={handleLimitChange}
                 className="border rounded px-2 py-1"
               >
-                {[5, 10, 20, 50, 100].map((value) => (
+                {PAGE_SIZE_OPTIONS.map((value) => (
                   <option key={value} value={value}>
                     {t('common.itemsPerPage', { count: value })}
                   </option>
