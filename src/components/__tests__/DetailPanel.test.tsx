@@ -87,15 +87,15 @@ describe('DetailPanel', () => {
 
   it('コピーボタンをクリックするとクリップボードに書き込まれること', async () => {
     renderPanel();
-    const copyButtons = screen.getAllByLabelText('common.copyButton');
-    await userEvent.click(copyButtons[0]);
+    const [firstCopyButton] = screen.getAllByLabelText('common.copyButton');
+    await userEvent.click(firstCopyButton!);
     expect(navigator.clipboard.writeText).toHaveBeenCalled();
   });
 
   it('コピー成功時に toast.success が呼ばれること', async () => {
     renderPanel();
-    const copyButtons = screen.getAllByLabelText('common.copyButton');
-    await userEvent.click(copyButtons[0]);
+    const [firstCopyButton] = screen.getAllByLabelText('common.copyButton');
+    await userEvent.click(firstCopyButton!);
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('common.copiedMessage');
     });
