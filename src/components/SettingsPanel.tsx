@@ -15,6 +15,9 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const { t } = useTranslation();
   const openExternalLink = useExternalLink();
   const [appVersion, setAppVersion] = useState('N/A');
+  const [licenses, setLicenses] = useState('');
+  const [loadingLicenses, setLoadingLicenses] = useState(false);
+  const [licensesError, setLicensesError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -23,6 +26,25 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
         .catch((err) => console.error('Failed to get app version:', err));
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setLoadingLicenses(true);
+    setLicensesError('');
+    fetch('./licenses.txt')
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch licenses: ${res.statusText}`);
+        return res.text();
+      })
+      .then((text) => {
+        setLicenses(text);
+        setLoadingLicenses(false);
+      })
+      .catch((err: unknown) => {
+        console.error('Error fetching licenses:', err);
+        setLicensesError('Failed to load licenses.');
+        setLoadingLicenses(false);
+      });
+  }, []);
 
   return (
     <SidePanel open={isOpen} onClose={onClose}>
@@ -46,6 +68,21 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           >
             {t('common.GitHubRepository')}
           </button>
+        </li>
+        <li className="mt-8 border-t pt-4 text-xs text-gray-500">
+          <p className="text-sm text-gray-500 mb-3">利用OSS・ライセンス一覧</p>
+          <div
+            className="flex-1 min-h-[100px] overflow-y-auto break-words"
+            style={{ maxHeight: 'calc(100vh - 300px)' }}
+          >
+            {loadingLicenses ? (
+              <p>Loading...</p>
+            ) : licensesError ? (
+              <p className="text-red-500">{licensesError}</p>
+            ) : (
+              <pre className="whitespace-pre-wrap break-words">{licenses}</pre>
+            )}
+          </div>
         </li>
       </ul>
     </SidePanel>

@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Generated license files (licenses.txt is committed, licenses.json is not)
+public/licenses.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
