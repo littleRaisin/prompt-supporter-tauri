@@ -16,7 +16,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const openExternalLink = useExternalLink();
   const [appVersion, setAppVersion] = useState('N/A');
   const [licenses, setLicenses] = useState('');
-  const [loadingLicenses, setLoadingLicenses] = useState(false);
+  const [loadingLicenses, setLoadingLicenses] = useState(true);
   const [licensesError, setLicensesError] = useState('');
 
   useEffect(() => {
@@ -28,8 +28,6 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   }, [isOpen]);
 
   useEffect(() => {
-    setLoadingLicenses(true);
-    setLicensesError('');
     fetch('./licenses.txt')
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch licenses: ${res.statusText}`);

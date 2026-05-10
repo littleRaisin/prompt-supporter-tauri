@@ -18,11 +18,11 @@ async function getCurrentVersion(db: Database): Promise<number> {
 
 async function runMigrations(db: Database): Promise<void> {
   const currentVersion = await getCurrentVersion(db);
-  console.log(`[DB] Current schema version: ${currentVersion}`);
+  console.warn(`[DB] Current schema version: ${currentVersion}`);
 
   for (const migration of migrations) {
     if (migration.version > currentVersion) {
-      console.log(`[DB] Running migration v${migration.version}: ${migration.description}`);
+      console.warn(`[DB] Running migration v${migration.version}: ${migration.description}`);
       await migration.up(db);
       await db.execute(
         'INSERT OR REPLACE INTO schema_version (version) VALUES ($1)',
@@ -31,7 +31,7 @@ async function runMigrations(db: Database): Promise<void> {
     }
   }
 
-  console.log('[DB] All migrations completed.');
+  console.warn('[DB] All migrations completed.');
 }
 
 export async function initDb(): Promise<Database> {
