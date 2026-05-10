@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -28,6 +28,8 @@ const SearchResult = () => {
 
   const { currentItem, sideOpen, handleClick, handleEdit, closeSidePanel } = useItemActions();
 
+  const requestIdRef = useRef(0);
+
   const refreshSearchResults = useCallback(() => {
     if (!promptName) return;
     setLoading(true);
@@ -39,32 +41,27 @@ const SearchResult = () => {
       copyright: params.get('copyright') === 'true',
     };
 
-    let cancelled = false;
+    const requestId = ++requestIdRef.current;
 
     searchTranslations({ keyword: promptName, categories, limit, page })
       .then((res) => {
-        if (cancelled) return;
+        if (requestId !== requestIdRef.current) return;
         setResult(res.items);
         setTotal(res.total);
       })
       .catch((err: unknown) => {
-        if (cancelled) return;
+        if (requestId !== requestIdRef.current) return;
         setResult(null);
         setTotal(0);
         toast.error(String(err));
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (requestId === requestIdRef.current) setLoading(false);
       });
-
-    return () => {
-      cancelled = true;
-    };
   }, [promptName, location.search, limit, page]);
 
   useEffect(() => {
-    const cancel = refreshSearchResults();
-    return cancel;
+    refreshSearchResults();
   }, [refreshSearchResults]);
 
   const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
