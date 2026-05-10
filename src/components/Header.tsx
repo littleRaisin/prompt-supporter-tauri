@@ -24,6 +24,7 @@ const Header = () => {
         ? (JSON.parse(saved) as SearchCategories)
         : { character: true, tag: true, copyright: true };
     } catch {
+      localStorage.removeItem(SEARCH_CATEGORIES_KEY);
       return { character: true, tag: true, copyright: true };
     }
   });
