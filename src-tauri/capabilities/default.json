@@ -7,6 +7,8 @@
     "core:default",
     "opener:default",
     "shell:allow-open",
-    "sql:default"
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select"
   ]
 }
