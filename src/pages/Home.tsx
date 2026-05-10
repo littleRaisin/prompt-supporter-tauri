@@ -56,7 +56,7 @@ const Home = () => {
     <div className="relative">
       <h2 className="text-xl font-bold mb-4">{t('common.Favorite List')}</h2>
       {loading ? (
-        <div>{t('common.Loading')}</div>
+        <div>Loading...</div>
       ) : favorites.length === 0 ? (
         <div>{t('common.No favorites')}</div>
       ) : (
