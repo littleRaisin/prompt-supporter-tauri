@@ -8,8 +8,8 @@ export type Translation = {
   /** NOT NULL DEFAULT 0 のため常に存在する */
   favorite: 0 | 1;
   copyrights?: string;
-  /** DEFAULT 'character' のため常に存在する */
-  category: Category;
+  /** DB上はDEFAULTのみでNOT NULL保証がないため未設定/NULLの可能性がある */
+  category?: Category;
   updated_at?: string;
 };
 
