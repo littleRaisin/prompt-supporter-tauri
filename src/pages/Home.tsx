@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import Result from '../components/Result';
 import Pagination from '../components/Pagination';
 import SidePanel from '../components/SidePanel';
@@ -28,7 +29,10 @@ const Home = () => {
         setFavorites(res.items);
         setTotal(res.total);
       })
-      .catch(console.error);
+      .catch((err: unknown) => {
+        console.error(err);
+        toast.error(String(err));
+      });
   }, [limit, page]);
 
   useEffect(() => {
