@@ -1,0 +1,19 @@
+# デフォルト: LF に正規化
+* text=auto eol=lf
+
+# Windows バッチファイルは CRLF を維持
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# バイナリファイル
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.db binary
