@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Result from '../components/Result';
@@ -25,18 +25,26 @@ const Home = () => {
 
   const { currentItem, sideOpen, handleClick, handleEdit, closeSidePanel } = useItemActions();
 
+  const requestIdRef = useRef(0);
+
   const refreshFavorites = useCallback(() => {
     setLoading(true);
+    const requestId = ++requestIdRef.current;
+
     getFavoriteList(limit, page)
       .then((res) => {
+        if (requestId !== requestIdRef.current) return;
         setFavorites(res.items);
         setTotal(res.total);
       })
       .catch((err: unknown) => {
+        if (requestId !== requestIdRef.current) return;
         console.error(err);
         toast.error(String(err));
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (requestId === requestIdRef.current) setLoading(false);
+      });
   }, [limit, page]);
 
   useEffect(() => {

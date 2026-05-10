@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -34,19 +34,27 @@ const FavoriteCategoryList = () => {
 
   const { currentItem, sideOpen, handleClick, handleEdit, closeSidePanel } = useItemActions();
 
+  const requestIdRef = useRef(0);
+
   const refreshFavorites = useCallback(() => {
     if (!category) return;
     setLoading(true);
+    const requestId = ++requestIdRef.current;
+
     getFavoriteListByCategory(limit, page, category)
       .then((res) => {
+        if (requestId !== requestIdRef.current) return;
         setFavorites(res.items);
         setTotal(res.total);
       })
       .catch((err: unknown) => {
+        if (requestId !== requestIdRef.current) return;
         console.error(err);
         toast.error(String(err));
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (requestId === requestIdRef.current) setLoading(false);
+      });
   }, [limit, page, category]);
 
   useEffect(() => {
