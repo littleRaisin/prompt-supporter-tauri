@@ -9,6 +9,7 @@ import DetailPanel from '../components/DetailPanel';
 import { useItemActions } from '../hooks/useItemActions';
 import { getFavoriteListByCategory } from '../db/repository';
 import type { Category, Translation } from '../types/Translation';
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '../constants/pagination';
 
 const VALID_CATEGORIES: Category[] = ['character', 'tag', 'copyright'];
 const isCategory = (v: string): v is Category =>
@@ -24,16 +25,18 @@ const FavoriteCategoryList = () => {
 
   const [limit, setLimit] = useState(() => {
     const saved = localStorage.getItem(LIMIT_KEY);
-    return saved ? Number(saved) : 20;
+    return saved ? Number(saved) : DEFAULT_PAGE_SIZE;
   });
   const [page, setPage] = useState(1);
   const [favorites, setFavorites] = useState<Translation[]>([]);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const { currentItem, sideOpen, handleClick, handleEdit, closeSidePanel } = useItemActions();
 
   const refreshFavorites = useCallback(() => {
     if (!category) return;
+    setLoading(true);
     getFavoriteListByCategory(limit, page, category)
       .then((res) => {
         setFavorites(res.items);
@@ -42,7 +45,8 @@ const FavoriteCategoryList = () => {
       .catch((err: unknown) => {
         console.error(err);
         toast.error(String(err));
-      });
+      })
+      .finally(() => setLoading(false));
   }, [limit, page, category]);
 
   useEffect(() => {
@@ -73,7 +77,9 @@ const FavoriteCategoryList = () => {
       <h2 className="text-xl font-bold mb-4">
         {t('common.Favorite List')}: {category ? categoryLabels[category] : ''}
       </h2>
-      {favorites.length === 0 ? (
+      {loading ? (
+        <div>{t('common.Loading')}</div>
+      ) : favorites.length === 0 ? (
         <div>{t('common.No favorites')}</div>
       ) : (
         <div className="w-full">
@@ -85,7 +91,7 @@ const FavoriteCategoryList = () => {
                 onChange={handleLimitChange}
                 className="border rounded px-2 py-1"
               >
-                {[5, 10, 20, 50, 100].map((value) => (
+                {PAGE_SIZE_OPTIONS.map((value) => (
                   <option key={value} value={value}>
                     {t('common.itemsPerPage', { count: value })}
                   </option>

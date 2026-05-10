@@ -9,6 +9,7 @@ import Pagination from '../components/Pagination';
 import { useItemActions } from '../hooks/useItemActions';
 import { searchTranslations } from '../db/repository';
 import type { Translation } from '../types/Translation';
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '../constants/pagination';
 
 const LIMIT_KEY = 'search_result_limit';
 
@@ -20,7 +21,7 @@ const SearchResult = () => {
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(() => {
     const saved = localStorage.getItem(LIMIT_KEY);
-    return saved ? Number(saved) : 20;
+    return saved ? Number(saved) : DEFAULT_PAGE_SIZE;
   });
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -38,21 +39,32 @@ const SearchResult = () => {
       copyright: params.get('copyright') === 'true',
     };
 
+    let cancelled = false;
+
     searchTranslations({ keyword: promptName, categories, limit, page })
       .then((res) => {
+        if (cancelled) return;
         setResult(res.items);
         setTotal(res.total);
       })
       .catch((err: unknown) => {
+        if (cancelled) return;
         setResult(null);
         setTotal(0);
         toast.error(String(err));
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [promptName, location.search, limit, page]);
 
   useEffect(() => {
-    refreshSearchResults();
+    const cancel = refreshSearchResults();
+    return cancel;
   }, [refreshSearchResults]);
 
   const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -82,7 +94,7 @@ const SearchResult = () => {
                 onChange={handleLimitChange}
                 className="border rounded px-2 py-1"
               >
-                {[5, 10, 20, 50, 100].map((value) => (
+                {PAGE_SIZE_OPTIONS.map((value) => (
                   <option key={value} value={value}>
                     {t('common.itemsPerPage', { count: value })}
                   </option>
