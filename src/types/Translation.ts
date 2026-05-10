@@ -5,9 +5,11 @@ export type Translation = {
   translation_text?: string;
   search_word?: string;
   note?: string;
-  favorite?: 0 | 1;
+  /** NOT NULL DEFAULT 0 のため常に存在する */
+  favorite: 0 | 1;
   copyrights?: string;
-  category?: Category;
+  /** DEFAULT 'character' のため常に存在する */
+  category: Category;
   updated_at?: string;
 };
 
