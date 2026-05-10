@@ -5,8 +5,10 @@ export type Translation = {
   translation_text?: string;
   search_word?: string;
   note?: string;
-  favorite?: 0 | 1;
+  /** NOT NULL DEFAULT 0 のため常に存在する */
+  favorite: 0 | 1;
   copyrights?: string;
+  /** DB上はDEFAULTのみでNOT NULL保証がないため未設定/NULLの可能性がある */
   category?: Category;
   updated_at?: string;
 };
