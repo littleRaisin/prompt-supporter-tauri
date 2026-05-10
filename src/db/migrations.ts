@@ -33,9 +33,16 @@ export const migrations: Migration[] = [
     version: 2,
     description: "Add category column to prompt_supporter",
     up: async (db) => {
-      await db.execute(`
-        ALTER TABLE prompt_supporter ADD COLUMN category TEXT DEFAULT 'character'
-      `);
+      // 移行済みDBにはすでにカラムが存在する場合があるため存在チェックを行う
+      const columns = await db.select<{ name: string }[]>(
+        `PRAGMA table_info(prompt_supporter)`
+      );
+      const hasCategory = columns.some((col) => col.name === 'category');
+      if (!hasCategory) {
+        await db.execute(`
+          ALTER TABLE prompt_supporter ADD COLUMN category TEXT DEFAULT 'character'
+        `);
+      }
     },
   },
 ];
